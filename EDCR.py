@@ -8,7 +8,7 @@ if sys.version_info[0] != 3:
     print('''--------------------------------------
     REQUIRED PYTHON 3.x
     use: python3 EDCR.py
-			By Mostafijur Rahhamn
+                        By Mostafijur Rahhamn
 --------------------------------------
     ''')
     sys.exit()
@@ -41,7 +41,9 @@ session.headers.update(headers)
 # Loop through passwords
 for i, passw in enumerate(passwords, start=1):
     passw = passw.strip()
-    if len(passw) < 6:
+
+    # Skip passwords that are not 4 to 6 digits long
+    if len(passw) < 4 or len(passw) > 6:
         continue
 
     print(f"{i} : {passw}")
