@@ -1,4 +1,4 @@
-# Open the file in write mode
+# Open the file in write mode h
 with open("passwords.txt", "w") as file:
     # Loop through numbers from 0000 to 2020
     for i in range(0, 2021):  # Include 2020 by setting the upper limit to 2021
